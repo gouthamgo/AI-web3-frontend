@@ -8,8 +8,8 @@ function App() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Define your backend API URL
-  const API_URL = 'https://ai-web3.onrender.com/generate'|| 'http://localhost:5000';
+  // Use the correct render.com URL without double 'generate'
+  const API_URL = 'https://ai-web3.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,19 +17,27 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/generate`, 
-        { prompt },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios({
+        method: 'post',
+        url: `${API_URL}/generate`,
+        data: { prompt },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      });
 
-      setGeneratedCode(response.data.code);
+      if (response.data && response.data.code) {
+        setGeneratedCode(response.data.code);
+      } else {
+        setError('Invalid response from server');
+      }
     } catch (error) {
       console.error('Error generating contract:', error);
-      setError(error.response?.data?.error || 'Failed to generate contract. Please try again.');
+      setError(
+        error.response?.data?.error || 
+        'Failed to connect to the server. Please try again later.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +64,7 @@ function App() {
         </form>
 
         {error && (
-          <div className="error">
+          <div className="error" style={{ color: 'red', margin: '1rem 0' }}>
             <p>{error}</p>
           </div>
         )}

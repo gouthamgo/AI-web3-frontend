@@ -9,7 +9,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://ai-web3.onrender.com', { prompt });
+      const response = await axios.post('https://ai-web3.onrender.com/generate', { prompt });
       setGeneratedCode(response.data.code);
     } catch (error) {
       console.error('Error generating contract:', error);
